@@ -10,10 +10,9 @@ public class WordCount {
 
    public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, Text, IntWritable> {
      HashMap<String,Integer> frequency=new HashMap<>();
-     int support=3;
      public void map(LongWritable key, Text value, OutputCollector<Text, IntWritable> output, Reporter reporter) throws IOException {
        String line = value.toString();
-       String tabDelim[]= line.split("\\t");
+       String tabDelim[]= line.split("\\s+");
        int maxLength=0;
        ArrayList<String> items=new ArrayList<>();
        for(String s : tabDelim) {
@@ -29,7 +28,7 @@ public class WordCount {
        }
        //backtracking algorithm and brute force
        LinkedList<String> stack=new LinkedList<>();
-       for (int i =2; i <=maxLength; i++) {
+       for (int i =2; i <=maxLength-1; i++) {
          int k=1;
          bruteforce(k,i,stack,tabDelim,items,0);
        }
@@ -39,13 +38,12 @@ public class WordCount {
        }
      }
      private  void bruteforce(int k,int i,LinkedList<String> stack,String[] commaDelim,ArrayList<String> items,int n){
-       if (k>=i){
+       if (k>i){
          int count=0;
          for (String s:commaDelim){
            if (find(stack,s)){
              count++;
            }
-           if (count>support){
              String frequenSet=new String();
              for (String str:stack){
                if (str.equals(stack.getLast())){
@@ -55,13 +53,11 @@ public class WordCount {
                }
              }
              frequency.put(frequenSet,count);
-           }
          }
        }else {
          for (int j = n; j <items.size(); j++) {
            stack.add(items.get(j));
-           k++;
-           bruteforce(k,i,stack,commaDelim,items,j+1);
+           bruteforce(k+1,i,stack,commaDelim,items,j+1);
          }
        }
        if (stack.size()>0) {
@@ -104,7 +100,9 @@ public class WordCount {
        while (values.hasNext()) {
          sum += values.next().get();
        }
-       output.collect(key, new IntWritable(sum));
+       if (sum>=5) {
+         output.collect(key, new IntWritable(sum));
+       }
      }
    }
 
