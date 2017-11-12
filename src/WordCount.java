@@ -13,7 +13,7 @@ public class WordCount {
 
 
     public void map(LongWritable key, Text value, OutputCollector<Text, IntWritable> output, Reporter reporter) throws IOException {
-      HashMap<String, Integer> frequency = new HashMap<>();
+      LinkedList<String> candidate=new LinkedList<>();
       String line = value.toString();
       ArrayList<String> items = new ArrayList<>();
       //seperate and sort
@@ -28,17 +28,16 @@ public class WordCount {
         LinkedList<String> stack = new LinkedList<>();
         for (int i = 2; i <= len - 1; i++) {
           int k = 1;
-          backTracking(k, i, stack, items, 0,frequency);
+          backTracking(k, i, stack, items, 0,candidate);
         }
         //output every item set
-        for (HashMap.Entry<String, Integer> entry : frequency.entrySet()) {
-          int i = 0;
-          output.collect(new Text(entry.getKey()), new IntWritable(entry.getValue()));
+        for (String s:candidate){
+          output.collect(new Text(s), new IntWritable(1));
         }
       }
     }
 
-    private void backTracking(int k, int i, LinkedList<String> stack,  ArrayList<String> items, int n,HashMap<String,Integer> frequency) {
+    private void backTracking(int k, int i, LinkedList<String> stack,  ArrayList<String> items, int n,LinkedList<String> candidate) {
       if (k > i) {
 //        for (String s : commaDelim) {
 //          if (find(stack, s)) {
@@ -52,11 +51,11 @@ public class WordCount {
               frequenSet = frequenSet + str + ",";
             }
           }
-          frequency.put(frequenSet, 1);
+          candidate.add(frequenSet);
       } else {
         for (int j = n; j < items.size(); j++) {
           stack.add(items.get(j));
-          backTracking(k + 1, i, stack, items, j + 1,frequency);
+          backTracking(k + 1, i, stack, items, j + 1,candidate);
         }
       }
       if (stack.size() > 0) {
