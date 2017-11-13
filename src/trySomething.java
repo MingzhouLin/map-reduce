@@ -3,7 +3,7 @@ public class trySomething {
         new trySomething().run();
     }
     public void run() {
-        String a="a,b,c,";
-        System.out.println(a.substring(0,a.length()-1));
+        long a=1<<62;
+        System.out.println(a);
     }
 }

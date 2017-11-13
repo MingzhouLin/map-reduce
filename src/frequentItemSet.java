@@ -1,4 +1,5 @@
 import java.io.*;
+import java.math.BigInteger;
 import java.util.*;
 
 import org.apache.hadoop.fs.Path;
@@ -25,18 +26,19 @@ public class frequentItemSet {
             }else {
                 int nCnt = items.size();
 
-                int nBit = (0xFFFFFFFF >>> (32 - nCnt));
+                long nBit =1<<nCnt;
 
-                for (int i = 1; i <= nBit; i++) {
+                for (long i = 1; i <nBit; i++) {
                     String candidate="{";
                     for (int j = 0; j < nCnt; j++) {
-                        if ((i<<(31-j)>>31) == -1) {
+                        if ((1<<j&i)!=0) {
                             candidate=candidate+items.get(j)+",";
                         }
                     }
                     candidate=candidate.substring(0,candidate.length()-1);
                     candidate=candidate+"}:";
-                    output.collect(new Text(candidate),new IntWritable(1));
+
+                    output.collect(new Text(candidate), new IntWritable(1));
                 }
             }
         }
